@@ -12,8 +12,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todoList = ToDo.toDoList();
+  List<ToDo> _foundToDo = [];
   final _todoController = TextEditingController();
 
+  @override
+  void initState() {
+    _foundToDo = todoList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +42,7 @@ class _HomeState extends State<Home> {
                           child: const Text('Tasks To be Done',style: TextStyle(fontSize: 30,fontWeight:FontWeight.w500),),
 
                         ),
-                        for (ToDo todoo in todoList)
+                        for (ToDo todoo in _foundToDo)
                           ToDoItem(
                             todo: todoo,
                             onToDoChanged: _handleTodoChange,
@@ -74,17 +80,23 @@ class _HomeState extends State<Home> {
               )
               ),
               Container(
-                margin: const EdgeInsets.only(bottom: 20,right: 20),
+                margin: const EdgeInsets.only(bottom: 20, right: 20),
                 child: ElevatedButton(
-                  child: Text('+',style: TextStyle(fontSize: 40),),
-                  onPressed: (){},
+                  onPressed: () {
+                    _addTodoItem(_todoController.text);
+                  },
                   style: ElevatedButton.styleFrom(
-                    primary: tdBlue,
+                    primary: Colors.blue,
                     minimumSize: const Size(60, 60),
-                    elevation: 10
+                    elevation: 10,
+                  ),
+                  child: const Text(
+                    '+',
+                    style: TextStyle(fontSize: 40),
                   ),
                 ),
               )
+
             ],),
           ),
         ]
@@ -110,6 +122,23 @@ class _HomeState extends State<Home> {
     setState(() {
       todoList.add(ToDo(id: DateTime.now().millisecondsSinceEpoch.toString(), todoText: todo));
     });
+    _todoController.clear();
+  }
+
+  void _runFilter(String enteredKeyWord){
+    List<ToDo> results = [];
+    if(enteredKeyWord.isEmpty){
+      results = todoList;
+    }else{
+      results = todoList
+          .where((item) => item.todoText!
+            .toLowerCase()
+            .contains(enteredKeyWord.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      _foundToDo = results;
+    });
   }
 
   Widget searchBox(){
@@ -120,8 +149,9 @@ class _HomeState extends State<Home> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20)
           ),
-          child: const TextField(
-            decoration: InputDecoration(
+          child: TextField(
+            onChanged: (value)=> _runFilter(value),
+            decoration: const InputDecoration(
               contentPadding: EdgeInsets.all(0),
               prefixIcon: Icon(
                 Icons.search, color: tdBlack, size: 20,
