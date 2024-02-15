@@ -3,30 +3,38 @@ import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/model/todo.dart';
 
 class ToDoItem extends StatelessWidget {
-  final ToDo toDo;
-  const ToDoItem({Key? key, required this.toDo}):super(key: key);
+  final ToDo todo;
+  final onToDoChanged;
+  final onDeleteItem;
+
+  const ToDoItem({Key? key, required this.todo,required this.onToDoChanged,required this.onDeleteItem}):super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: ListTile(
-        onTap: (){},
+        onTap: (){
+          onToDoChanged(todo);
+        },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         tileColor: Colors.white,
-        leading: Icon(Icons.check_box, color: tdBlue,),
+        leading: Icon(
+          (todo.isDone ?? false)? Icons.check_box : Icons.check_box_outline_blank,
+          color: tdBlue,
+        ),
         title: Text(
-          toDo.todoText!,
+          todo.todoText!,
           style: TextStyle(
               fontSize: 16,
               color: tdBlack,
-              decoration: TextDecoration.lineThrough
+              decoration: (todo.isDone ?? false)? TextDecoration.lineThrough: null,
           ),
         ),
         trailing: Container(
-          padding: EdgeInsets.all(0),
-          margin: EdgeInsets.symmetric(vertical: 12 ),
+          padding: const EdgeInsets.all(0),
+          margin: const EdgeInsets.symmetric(vertical: 12 ),
           height: 35,
           width: 35,
           decoration: BoxDecoration(
@@ -36,8 +44,10 @@ class ToDoItem extends StatelessWidget {
           child: IconButton(
             color: Colors.white,
             iconSize: 18,
-            icon: Icon(Icons.delete),
-            onPressed: (){},
+            icon: const Icon(Icons.delete),
+            onPressed: (){
+              onDeleteItem(todo.id);
+            },
           ),
         ),
       ),
